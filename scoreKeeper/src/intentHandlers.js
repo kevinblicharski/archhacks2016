@@ -12,6 +12,7 @@ var textHelper = require('./textHelper'),
 var currentMedName;
 var currentMedDosage;
 var currentMedDuration;
+var currentMedFrequency;
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
     intentHandlers.NewMedIntent = function (intent, session, response) {
@@ -25,25 +26,35 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
           if (intent.slots.Dosage.value != null)
           {
             currentMedDosage = intent.slots.Dosage.value;
-            if (intent.slots.Duration.value != null)
+            if (intent.slots.Frequency.value != null)
             {
-              currentMedDuration = intent.slots.Duration.value;
-              var date = new Date();
-              for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
+              currentMedFrequency = intent.slots.Frequency.value;
+              if (intent.slots.Duration.value != null)
               {
-                var key = currentMedName + ';' + textHelper.formatDate(date);
-                var value = currentMedDosage + ';not taken';
-                medList.data.medications.push(key);
-                medList.data.dosages[key] = value;
-                date.setDate(date.getDate() + 1);
+                currentMedDuration = intent.slots.Duration.value;
+                var date = new Date();
+                for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
+                {
+                  var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
+                    + currentMedFrequency;
+                  var value = currentMedDosage + ';not taken';
+                  medList.data.medications.push(key);
+                  medList.data.dosages[key] = value;
+                  date.setDate(date.getDate() + 1);
+                }
+                speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
+                  + currentMedDuration + '.';
               }
-              speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-                + currentMedDuration + '.';
+              else
+              {
+                speechOutput = 'How long will you be taking ' + currentMedName + '?';
+                reprompt = 'How long will you be taking ' + currentMedName + '?';
+              }
             }
             else
             {
-              speechOutput = 'How long will you be taking ' + currentMedName + '?';
-              reprompt = 'How long will you be taking ' + currentMedName + '?';
+              speechOutput = 'How often will you be taking ' + currentMedName + '?';
+              reprompt = 'How often will you be taking  ' + currentMedName + '?';
             }
           }
           else
@@ -69,11 +80,31 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
           var speechOutput,
               reprompt;
           currentMedDosage = intent.slots.Dosage.value;
-          speechOutput = 'How long will you be taking ' + currentMedName + '?';
-          reprompt = 'How long will you be taking ' + currentMedName + '?';
+          speechOutput = 'How often will you be taking ' + currentMedName + '?';
+          reprompt = 'How often will you be taking ' + currentMedName + '?';
           medList.save(function () {
               response.ask(speechOutput, reprompt);
           });
+      });
+    };
+
+    /*
+    medList.data.medications --> all the keys in the form "medName;yyyy-mm-dd"
+      Example: "Tylenol;2016-11-05"
+    medList.data.dosages[key] --> the value for the key in the form "dosageAmount;taken/not taken"
+      Example: "3 mg;not taken"
+    probably want to add something to the key, i.e. "medName;yyyy-mm-dd;frequencyTag"
+    */
+    intentHandlers.GetFrequencyIntent = function (intent, session, response) {
+      storage.loadMedList(session, function (medList) {
+        // code goes here
+
+        speechOutput = 'How long will you be taking ' + currentMedName + '?';
+        reprompt = 'How long will you be taking ' + currentMedName + '?';
+        medList.save(function () {
+            response.ask(speechOutput, reprompt);
+        });
+
       });
     };
 
