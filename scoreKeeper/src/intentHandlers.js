@@ -116,18 +116,35 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
       storage.loadMedList(session, function (medList) {
-          var speechOutput, frequency;
+          var speechOutput, frequencyArray;
+          var frequency = 1;
+
           currentMedDuration = intent.slots.Duration.value;
           var date = new Date();
           
-          if(currentFrequencyValue == "daily"){
+          if(currentMedFrequency === "daily"){
             frequency = 1;
           }
-          else if(currentFrequencyValue == "every other day"){
+          else if(currentMedFrequency === "every other day"){
             frequency = 2;
           }
           else{
-            frequency = currentMedFrequency.split(' ')[1];
+            frequencyArray = currentMedFrequency.split(' ');
+
+            for(var i=0; i<frequencyArray.length; i++){
+
+              if(frequencyArray[i] === parseInt(frequencyArray[i], 10)){
+                frequency = frequencyArray[i];
+              }
+
+              if(frequencyArray[i] === "week" || frequencyArray[i] === "weeks"){
+                frequency *= 7;
+              }
+
+              if(frequencyArray[i] === "month" || frequencyArray[i] === "months"){
+                frequency *= 30;
+              }
+            }
           }
 
           for (var i = 0; i < currentMedDuration.split(' ')[0]; i += frequency)
@@ -137,7 +154,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             var value = currentMedDosage + ';not taken';
             medList.data.medications.push(key);
             medList.data.dosages[key] = value;
-
 
             date.setDate(date.getDate() + frequency);
           }
