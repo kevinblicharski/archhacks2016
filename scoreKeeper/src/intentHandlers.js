@@ -180,12 +180,57 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         });
     };
 
-    intentHandlers.SendEmailIntent = function (intent, session, response) {
-      storage.loadMedList(session, function (medList) {
-        // email shit goes Here
-
-      });
+    intentHandlers.MarkTakenIntent = function (intent, session, response) {
+        storage.loadMedList(session, function (medList) {
+            var speechOutput;
+            var medName = intent.slots.Medication.value;
+            var date = textHelper.formatDate(new Date());
+            var key = medName + ';' + date;
+            var value = medList.data.dosages[key].split(';');
+            value[1] = "taken";
+            medList.data.dosages[key] = value.join(';');
+            speechOutput = 'Great job taking your ' + medName + '.';
+            medList.data.medications.forEach(function (med) {
+                medListCopy.push({
+                    dosage: medList.data.dosages[med],
+                    name: med
+                });
+            });
+            var anythingLeftToTake = false;
+            medListCopy.forEach(function (med)
+            {
+              var parsedKey = med.name.split(';');
+              if (parsedKey[1] === currentDate)
+              {
+                var todayMed = med.dosage.split(';');
+                if (todayMed.length == 1 || todayMed[1] == 'not taken')
+                {
+                  if (!anythingLeftToTake)
+                  {
+                    speechOutput += ' You still need to take the following. ';
+                    anythingLeftToTake = true;
+                  }
+                  speechOutput += (todayMed[0] + ' of ' + parsedKey[0] + '. ');
+                }
+              }
+              if (!anythingLeftToTake)
+              {
+                speechOutput += ' You have no other medications to take today.';
+              }
+            });
+            response.tell(speechOutput);
+            medList.save(function () {
+                response.tell(speechOutput);
+            });
+        });
     };
+
+    // intentHandlers.SendEmailIntent = function (intent, session, response) {
+    //   storage.loadMedList(session, function (medList) {
+    //     // email shit goes Here
+    //
+    //   });
+    // };
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players
