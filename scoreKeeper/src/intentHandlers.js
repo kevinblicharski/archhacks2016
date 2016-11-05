@@ -13,37 +13,24 @@ var textHelper = require('./textHelper'),
     storage = require('./storage');
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
-    intentHandlers.NewGameIntent = function (intent, session, response) {
-        //reset scores for all existing players
-        storage.loadGame(session, function (currentGame) {
-            if (currentGame.data.players.length === 0) {
-                response.ask('New game started. Who\'s your first player?',
-                    'Please tell me who\'s your first player?');
-                return;
-            }
-            currentGame.data.players.forEach(function (player) {
-                currentGame.data.scores[player] = 0;
-            });
-            currentGame.save(function () {
-                var speechOutput = 'New game started with '
-                    + currentGame.data.players.length + ' existing player';
-                if (currentGame.data.players.length > 1) {
-                    speechOutput += 's';
-                }
-                speechOutput += '.';
-                if (skillContext.needMoreHelp) {
-                    speechOutput += '. You can give a player points, add another player, reset all players or exit. What would you like?';
-                    var repromptText = 'You can give a player points, add another player, reset all players or exit. What would you like?';
-                    response.ask(speechOutput, repromptText);
-                } else {
-                    response.tell(speechOutput);
-                }
-            });
-        });
+    intentHandlers.NewMedIntent = function (intent, session, response) {
+
     };
 
-    intentHandlers.DailyScheduleIntent = function (intent, session, response) {
-        //Gives daily schedule of medications for user
+    intentHandlers.DeleteMedIntent = function (intent, session, response) {
+
+    };
+
+    intentHandlers.GetMedsIntent = function (intent, session, response) {
+
+    };
+
+    intentHandlers.MedTakenEvent = function (intent, session, response) {
+
+    };
+
+    intentHandlers.NewGameIntent = function (intent, session, response) {
+        //reset scores for all existing players
         storage.loadGame(session, function (currentGame) {
             if (currentGame.data.players.length === 0) {
                 response.ask('New game started. Who\'s your first player?',

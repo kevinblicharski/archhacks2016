@@ -17,12 +17,8 @@ var textHelper = (function () {
 
     return {
         completeHelp: 'Here\'s some things you can say,'
-        + ' add john.'
-        + ' give john 5 points.'
-        + ' tell me the score.'
-        + ' new game.'
-        + ' reset.'
-        + ' and exit.',
+        + ' tell me my meds for today.'
+        + ' and I took my warfarin.'
         nextHelp: 'You can give a player points, add a player, get the current score, or say help. What would you like?',
 
         getPlayerName: function (recognizedPlayerName) {
