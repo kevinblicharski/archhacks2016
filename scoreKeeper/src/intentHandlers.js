@@ -25,7 +25,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       storage.loadGame(session, function (currentGame) {
           var speechOutput,
               reprompt;
-          if (currentGame.data.scores[newPlayerName] !== undefined) {
+          if (currentGame.data.usages[newPlayerName] !== undefined) {
               speechOutput = newPlayerName + ' has already joined the game.';
               if (skillContext.needMoreHelp) {
                   response.ask(speechOutput + ' What else?', 'What else?');
@@ -35,10 +35,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
               return;
           }
           speechOutput = newPlayerName + ' has joined your game. ';
-          currentGame.data.players.push(newPlayerName);
-          currentGame.data.scores[newPlayerName] = 0;
+          currentGame.data.medications.push(newPlayerName);
+          currentGame.data.usages[newPlayerName] = 0;
           if (skillContext.needMoreHelp) {
-              if (currentGame.data.players.length == 1) {
+              if (currentGame.data.medications.length == 1) {
                   speechOutput += 'You can say, I am Done Adding Players. Now who\'s your next player?';
                   reprompt = textHelper.nextHelp;
               } else {
