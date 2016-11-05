@@ -87,6 +87,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.MedTakenEvent = function (intent, session, response) {
 
+
     };
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
@@ -122,16 +123,16 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         //add a player to the current game,
         //terminate or continue the conversation based on whether the intent
         //is from a one shot command or not.
-        var newPlayerName = textHelper.getMedName(intent.slots.PlayerName.value);
-        if (!newPlayerName) {
+        var newMedicationName = textHelper.getMedName(intent.slots.PlayerName.value);
+        if (!newMedicationName) {
             response.ask('OK. Who do you want to add?', 'Who do you want to add?');
             return;
         }
         storage.loadMedList(session, function (medListData) {
             var speechOutput,
                 reprompt;
-            if (medListData.data.scores[newPlayerName] !== undefined) {
-                speechOutput = newPlayerName + ' has already joined the game.';
+            if (medListData.data.scores[newMedicationName] !== undefined) {
+                speechOutput = newMedicationName + ' has already joined the game.';
                 if (skillContext.needMoreHelp) {
                     response.ask(speechOutput + ' What else?', 'What else?');
                 } else {
@@ -139,9 +140,9 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 }
                 return;
             }
-            speechOutput = newPlayerName + ' has joined your game. ';
-            medListData.data.players.push(newPlayerName);
-            medListData.data.scores[newPlayerName] = 0;
+            speechOutput = newMedicationName + ' has joined your game. ';
+            medListData.data.players.push(newMedicationName);
+            medListData.data.scores[newMedicationName] = 0;
             if (skillContext.needMoreHelp) {
                 if (medListData.data.players.length == 1) {
                     speechOutput += 'You can say, I am Done Adding Players. Now who\'s your next player?';
