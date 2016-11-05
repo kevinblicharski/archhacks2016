@@ -20,7 +20,7 @@ var storage = (function () {
         } else {
             this.data = {
                 medications: [],
-                usages: {}
+                dosages: {}
             };
         }
         this._session = session;
@@ -32,8 +32,8 @@ var storage = (function () {
             //it can be used as an indication of whether the game has just started
             var allEmpty = true;
             var medListData = this.data;
-            medListData.medications.forEach(function (medication) {
-                if (medListData.usages[medication] !== 0) {
+            medListData.medications.forEach(function (med) {
+                if (medListData.dosages[med] !== 0) {
                     allEmpty = false;
                 }
             });
@@ -42,7 +42,7 @@ var storage = (function () {
         save: function (callback) {
             //save the game states in the session,
             //so next time we can save a read from dynamoDB
-            this._session.attributes.medListData = this.data;
+            this._session.attributes.medList = this.data;
             dynamodb.putItem({
                 TableName: 'MedManagerMedicationTable',
                 Item: {
@@ -66,9 +66,9 @@ var storage = (function () {
 
     return {
         loadMedList: function (session, callback) {
-            if (session.attributes.medListData) {
-                console.log('get medList from session=' + session.attributes.medListData);
-                callback(new MedList(session, session.attributes.medListData));
+            if (session.attributes.medList) {
+                console.log('get game from session=' + session.attributes.medList);
+                callback(new MedList(session, session.attributes.medList));
                 return;
             }
             dynamodb.getItem({
@@ -79,25 +79,25 @@ var storage = (function () {
                     }
                 }
             }, function (err, data) {
-                var medListData;
+                var medList;
                 if (err) {
                     console.log(err, err.stack);
-                    medListData = new MedList(session);
-                    session.attributes.medListData = medListData.data;
-                    callback(medListData);
+                    medList = new MedList(session);
+                    session.attributes.medList = medList.data;
+                    callback(medList);
                 } else if (data.Item === undefined) {
-                    medListData = new MedList(session);
-                    session.attributes.medListData = medListData.data;
-                    callback(medListData);
+                    medList = new MedList(session);
+                    session.attributes.medList = medList.data;
+                    callback(medList);
                 } else {
-                    console.log('get medList from dynamodb=' + data.Item.Data.S);
-                    medListData = new MedList(session, JSON.parse(data.Item.Data.S));
-                    session.attributes.medListData = medListData.data;
-                    callback(medListData);
+                    console.log('get game from dynamodb=' + data.Item.Data.S);
+                    medList = new MedList(session, JSON.parse(data.Item.Data.S));
+                    session.attributes.medList = medList.data;
+                    callback(medList);
                 }
             });
         },
-        newGame: function (session) {
+        newMedList: function (session) {
             return new MedList(session);
         }
     };

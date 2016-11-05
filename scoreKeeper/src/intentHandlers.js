@@ -1,10 +1,7 @@
 /**
     Copyright 2014-2015 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-
     Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
-
         http://aws.amazon.com/apache2.0/
-
     or in the "license" file accompanying this file. This file is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
 */
 
@@ -12,17 +9,17 @@
 var textHelper = require('./textHelper'),
     storage = require('./storage');
 
-var currentMedName = 'noooooo';
-var currentMedDosage = '2';
-var currentMedDuration = '5 days';
+var currentMedName;
+var currentMedDosage;
+var currentMedDuration;
 
 var registerIntentHandlers = function (intentHandlers, skillContext) {
     intentHandlers.NewMedIntent = function (intent, session, response) {
       //add a player to the current game,
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
-      currentMedName = textHelper.getMedName(intent.slots.Medication.value);
-      storage.loadMedList(session, function (medListData) {
+      currentMedName = intent.slots.Medication.value;
+      storage.loadMedList(session, function (medList) {
           var speechOutput,
               reprompt;
           if (intent.slots.Dosage.value != null)
@@ -32,16 +29,16 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             {
               currentMedDuration = intent.slots.Duration.value;
               var date = new Date();
-              for (var i = 0; i < currentMedDuration; ++i)
+              for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
               {
                 var key = currentMedName + ';' + textHelper.formatDate(date);
                 var value = currentMedDosage + ';not taken';
-                medListData.data.medications.push(currentMedName);
-                medListData.data.usages[currentMedName] = value;
-                date.setDate(date.getDate + 1);
+                medList.data.medications.push(key);
+                medList.data.dosages[key] = value;
+                date.setDate(date.getDate() + 1);
               }
               speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-                + currentMedDuration;
+                + currentMedDuration + '.';
             }
             else
             {
@@ -54,7 +51,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             speechOutput = 'How much ' + currentMedName + ' will you be taking?';
             reprompt = 'How much ' + currentMedName + ' will you be taking?';
           }
-          medListData.save(function () {
+          medList.save(function () {
               if (reprompt) {
                   response.ask(speechOutput, reprompt);
               } else {
@@ -64,53 +61,98 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       });
     };
 
-    intentHandlers.DeleteMedIntent = function (intent, session, response) {
+    intentHandlers.GetDosageIntent = function (intent, session, response) {
+      //add a player to the current game,
+      //terminate or continue the conversation based on whether the intent
+      //is from a one shot command or not.
+      storage.loadMedList(session, function (medList) {
+          var speechOutput,
+              reprompt;
+          currentMedDosage = intent.slots.Dosage.value;
+          speechOutput = 'How long will you be taking ' + currentMedName + '?';
+          reprompt = 'How long will you be taking ' + currentMedName + '?';
+          medList.save(function () {
+              response.ask(speechOutput, reprompt);
+          });
+      });
+    };
 
+    intentHandlers.GetDurationIntent = function (intent, session, response) {
+      //add a player to the current game,
+      //terminate or continue the conversation based on whether the intent
+      //is from a one shot command or not.
+      storage.loadMedList(session, function (medList) {
+          var speechOutput;
+          currentMedDuration = intent.slots.Duration.value;
+          var date = new Date();
+          for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
+          {
+            var key = currentMedName + ';' + textHelper.formatDate(date);
+            var value = currentMedDosage + ';not taken';
+            medList.data.medications.push(key);
+            medList.data.dosages[key] = value;
+            date.setDate(date.getDate() + 1);
+          }
+          speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
+            + currentMedDuration + '.';
+          medList.save(function () {
+              response.tell(speechOutput);
+          });
+      });
     };
 
     intentHandlers.GetMedsIntent = function (intent, session, response) {
-        var speechOutput = 'Today you need to take the following medications: ';
-        var currentDate = textHelper.formatDate(new Date());
-        medListData.data.medications.forEach(function (med)
-          var parsedKey = textHelper.parseMedKey(med);
-          if (parsedKey[1] === currentDate)
-          {
-            var todayMed = textHelper.parseMedValue(medListData.data.scores[med]);
-            if (todayMed.length == 1 || todayMed[1] = "not taken")
-            {
-              speechOutput += todayMed[0] + " of " + parsedKey + ", ";
+        storage.loadMedList(session, function (medList) {
+            var medListCopy = [],
+                speechOutput = 'You need to take the following today. ';
+            if (medList.data.medications.length === 0) {
+                response.tell('You have no medications to take today.');
+                return;
             }
-          }
-        )
-        response.tell(speechOutput);
-    };
-
-    intentHandlers.MedTakenEvent = function (intent, session, response) {
-
-
+            medList.data.medications.forEach(function (med) {
+                medListCopy.push({
+                    dosage: medList.data.dosages[med],
+                    name: med
+                });
+            });
+            var currentDate = textHelper.formatDate(new Date());
+            medListCopy.forEach(function (med)
+            {
+              var parsedKey = med.name.split(';');
+              if (parsedKey[1] === currentDate)
+              {
+                var todayMed = med.dosage.split(';');
+                if (todayMed.length == 1 || todayMed[1] == 'not taken')
+                {
+                  speechOutput += (todayMed[0] + ' of ' + parsedKey[0] + '. ');
+                }
+              }
+            });
+            response.tell(speechOutput);
+        });
     };
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players
-        storage.loadMedList(session, function (medListData) {
-            if (medListData.data.players.length === 0) {
+        storage.loadMedList(session, function (medList) {
+            if (medList.data.medications.length === 0) {
                 response.ask('New game started. Who\'s your first player?',
                     'Please tell me who\'s your first player?');
                 return;
             }
-            medListData.data.players.forEach(function (player) {
-                medListData.data.scores[player] = 0;
+            medList.data.medications.forEach(function (med) {
+                medList.data.dosages[med] = 0;
             });
-            medListData.save(function () {
+            medList.save(function () {
                 var speechOutput = 'New game started with '
-                    + medListData.data.players.length + ' existing player';
-                if (medListData.data.players.length > 1) {
+                    + medList.data.medications.length + ' existing player';
+                if (medList.data.medications.length > 1) {
                     speechOutput += 's';
                 }
                 speechOutput += '.';
                 if (skillContext.needMoreHelp) {
-                    speechOutput += '. You can give a player points, add another player, reset all players or exit. What would you like?';
-                    var repromptText = 'You can give a player points, add another player, reset all players or exit. What would you like?';
+                    speechOutput += '. You can give a player points, add another player, reset all medications or exit. What would you like?';
+                    var repromptText = 'You can give a player points, add another player, reset all medications or exit. What would you like?';
                     response.ask(speechOutput, repromptText);
                 } else {
                     response.tell(speechOutput);
@@ -123,16 +165,16 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         //add a player to the current game,
         //terminate or continue the conversation based on whether the intent
         //is from a one shot command or not.
-        var newMedicationName = textHelper.getMedName(intent.slots.PlayerName.value);
-        if (!newMedicationName) {
+        var newPlayerName = textHelper.getPlayerName(intent.slots.Medication.value);
+        if (!newPlayerName) {
             response.ask('OK. Who do you want to add?', 'Who do you want to add?');
             return;
         }
-        storage.loadMedList(session, function (medListData) {
+        storage.loadMedList(session, function (medList) {
             var speechOutput,
                 reprompt;
-            if (medListData.data.scores[newMedicationName] !== undefined) {
-                speechOutput = newMedicationName + ' has already joined the game.';
+            if (medList.data.dosages[newPlayerName] !== undefined) {
+                speechOutput = newPlayerName + ' has already joined the game.';
                 if (skillContext.needMoreHelp) {
                     response.ask(speechOutput + ' What else?', 'What else?');
                 } else {
@@ -140,19 +182,19 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 }
                 return;
             }
-            speechOutput = newMedicationName + ' has joined your game. ';
-            medListData.data.players.push(newMedicationName);
-            medListData.data.scores[newMedicationName] = 0;
+            speechOutput = newPlayerName + ' has joined your game. ';
+            medList.data.medications.push(newPlayerName);
+            medList.data.dosages[newPlayerName] = 0;
             if (skillContext.needMoreHelp) {
-                if (medListData.data.players.length == 1) {
-                    speechOutput += 'You can say, I am Done Adding Players. Now who\'s your next player?';
+                if (medList.data.medications.length == 1) {
+                    speechOutput += 'You can say, I am Done Adding Medications. Now who\'s your next player?';
                     reprompt = textHelper.nextHelp;
                 } else {
                     speechOutput += 'Who is your next player?';
                     reprompt = textHelper.nextHelp;
                 }
             }
-            medListData.save(function () {
+            medList.save(function () {
                 if (reprompt) {
                     response.ask(speechOutput, reprompt);
                 } else {
@@ -164,7 +206,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.AddScoreIntent = function (intent, session, response) {
         //give a player points, ask additional question if slot values are missing.
-        var playerName = textHelper.getMedName(intent.slots.PlayerName.value),
+        var playerName = textHelper.getPlayerName(intent.slots.Medication.value),
             score = intent.slots.ScoreNumber,
             scoreValue;
         if (!playerName) {
@@ -177,15 +219,15 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             response.ask('sorry, I did not hear the points, please say that again', 'please say the points again');
             return;
         }
-        storage.loadMedList(session, function (medListData) {
+        storage.loadMedList(session, function (medList) {
             var targetPlayer, speechOutput = '', newScore;
-            if (medListData.data.players.length < 1) {
+            if (medList.data.medications.length < 1) {
                 response.ask('sorry, no player has joined the game yet, what can I do for you?', 'what can I do for you?');
                 return;
             }
-            for (var i = 0; i < medListData.data.players.length; i++) {
-                if (medListData.data.players[i] === playerName) {
-                    targetPlayer = medListData.data.players[i];
+            for (var i = 0; i < medList.data.medications.length; i++) {
+                if (medList.data.medications[i] === playerName) {
+                    targetPlayer = medList.data.medications[i];
                     break;
                 }
             }
@@ -193,23 +235,23 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 response.ask('Sorry, ' + playerName + ' has not joined the game. What else?', playerName + ' has not joined the game. What else?');
                 return;
             }
-            newScore = medListData.data.scores[targetPlayer] + scoreValue;
-            medListData.data.scores[targetPlayer] = newScore;
+            newScore = medList.data.dosages[targetPlayer] + scoreValue;
+            medList.data.dosages[targetPlayer] = newScore;
 
             speechOutput += scoreValue + ' for ' + targetPlayer + '. ';
-            if (medListData.data.players.length == 1 || medListData.data.players.length > 3) {
+            if (medList.data.medications.length == 1 || medList.data.medications.length > 3) {
                 speechOutput += targetPlayer + ' has ' + newScore + ' in total.';
             } else {
                 speechOutput += 'That\'s ';
-                medListData.data.players.forEach(function (player, index) {
-                    if (index === medListData.data.players.length - 1) {
+                medList.data.medications.forEach(function (player, index) {
+                    if (index === medList.data.medications.length - 1) {
                         speechOutput += 'And ';
                     }
-                    speechOutput += player + ', ' + medListData.data.scores[player];
+                    speechOutput += player + ', ' + medList.data.dosages[player];
                     speechOutput += ', ';
                 });
             }
-            medListData.save(function () {
+            medList.save(function () {
                 response.tell(speechOutput);
             });
         });
@@ -217,18 +259,18 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.TellScoresIntent = function (intent, session, response) {
         //tells the scores in the leaderboard and send the result in card.
-        storage.loadMedList(session, function (medListData) {
+        storage.loadMedList(session, function (medList) {
             var sortedPlayerScores = [],
                 continueSession,
                 speechOutput = '',
                 leaderboard = '';
-            if (medListData.data.players.length === 0) {
+            if (medList.data.medications.length === 0) {
                 response.tell('Nobody has joined the game.');
                 return;
             }
-            medListData.data.players.forEach(function (player) {
+            medList.data.medications.forEach(function (player) {
                 sortedPlayerScores.push({
-                    score: medListData.data.scores[player],
+                    score: medList.data.dosages[player],
                     player: player
                 });
             });
@@ -255,7 +297,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.ResetPlayersIntent = function (intent, session, response) {
         //remove all players
-        storage.newGame(session).save(function () {
+        storage.newMedList(session).save(function () {
             response.ask('New game started without players, who do you want to add first?', 'Who do you want to add first?');
         });
     };
