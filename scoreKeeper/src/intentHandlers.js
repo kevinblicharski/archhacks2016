@@ -118,7 +118,8 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
           var date = new Date();
           for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
           {
-            var key = currentMedName + ';' + textHelper.formatDate(date);
+            var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
+              + currentMedFrequency;
             var value = currentMedDosage + ';not taken';
             medList.data.medications.push(key);
             medList.data.dosages[key] = value;
