@@ -36,8 +36,8 @@ var storage = (function () {
             //it can be used as an indication of whether the game has just started
             var allEmpty = true;
             var gameData = this.data;
-            gameData.medications.forEach(function (medications) {
-                if (gameData.usages[medications] !== 0) { //MIGHT NEED TO DO '' INSTEAD OF 0
+            gameData.medications.forEach(function (medication) {
+                if (gameData.usages[medication] !== 0) { //MIGHT NEED TO DO '' INSTEAD OF 0
                     allEmpty = false;
                 }
             });

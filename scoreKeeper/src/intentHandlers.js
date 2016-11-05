@@ -17,7 +17,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //add a player to the current game,
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
-      var newPlayerName = textHelper.getMedName(intent.slots.PlayerName.value);
+      var newPlayerName = textHelper.getMedName(intent.slots.Medication.value);
       if (!newPlayerName) {
           response.ask('OK. Who do you want to add?', 'Who do you want to add?');
           return;
