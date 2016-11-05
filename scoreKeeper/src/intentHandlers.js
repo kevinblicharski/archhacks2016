@@ -137,11 +137,19 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 frequency = frequencyArray[i];
               }
 
-              if(frequencyArray[i] === "week" || frequencyArray[i] === "weeks"){
+              if(frequencyArray[i] === "weekly" || frequencyArray[i] === "week" || frequencyArray[i] === "weeks"){
+                if(frequencyArray[i-1] === "other" ||){
+                  frequency *= 2;
+                }
+
                 frequency *= 7;
               }
 
-              if(frequencyArray[i] === "month" || frequencyArray[i] === "months"){
+              if(frequencyArray[i] === "monthly" || frequencyArray[i] === "month" || frequencyArray[i] === "months"){
+                if(frequencyArray[i-1] === "other" ||){
+                  frequency *= 2;
+                }
+                
                 frequency *= 30;
               }
             }
