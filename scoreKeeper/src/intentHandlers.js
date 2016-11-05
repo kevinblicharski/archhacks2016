@@ -31,15 +31,15 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             if (intent.slots.Duration.value != null)
             {
               currentMedDuration = intent.slots.Duration.value;
-              var date = textHelper.getDate();
+              var date = new Date();
               for (var i = 0; i < currentMedDuration; ++i)
               {
-
+                var key = currentMedName + ';' + textHelper.formatDate(date);
+                var value = currentMedDosage + ';not taken';
+                medListData.data.medications.push(currentMedName);
+                medListData.data.usages[currentMedName] = value;
+                date.setDate(date.getDate + 1);
               }
-              var key = currentMedName + ';' + currentMedDuration;
-              var value = currentMedDosage + ';not taken';
-              medListData.data.medications.push(currentMedName);
-              medListData.data.usages[currentMedName] = value;
               speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
                 + currentMedDuration;
             }
