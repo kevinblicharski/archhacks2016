@@ -13,7 +13,7 @@ var AlexaSkill = require('./AlexaSkill'),
     eventHandlers = require('./eventHandlers'),
     intentHandlers = require('./intentHandlers');
 
-var APP_ID = undefined;//replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
+var APP_ID = "amzn1.ask.skill.1eb1969c-6a22-409c-8c37-8d8dceb7ad4c";//replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 var skillContext = {};
 
 /**
@@ -36,4 +36,3 @@ eventHandlers.register(ScoreKeeper.prototype.eventHandlers, skillContext);
 intentHandlers.register(ScoreKeeper.prototype.intentHandlers, skillContext);
 
 module.exports = ScoreKeeper;
-
