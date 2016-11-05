@@ -17,13 +17,13 @@ var textHelper = (function () {
 
     return {
         completeHelp: 'Here\'s some things you can say,'
-        + ' add john.'
-        + ' give john 5 points.'
-        + ' tell me the score.'
-        + ' new game.'
+        + ' add Tylenol'
+        + ' schedule john for 5 days'
+        + ' tell me my med schedule'
+        + ' new drug'
         + ' reset.'
         + ' and exit.',
-        nextHelp: 'You can give a player points, add a player, get the current score, or say help. What would you like?',
+        nextHelp: 'You can give a drug a schedule, add a schedule, get the schedule for a drug, or say help. What would you like?',
 
         getPlayerName: function (recognizedPlayerName) {
             if (!recognizedPlayerName) {

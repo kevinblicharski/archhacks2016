@@ -22,8 +22,9 @@ var storage = (function () {
             this.data = data;
         } else {
             this.data = {
-                players: [],
-                scores: {}
+                medications: [],
+                usages: {}
+                
             };
         }
         this._session = session;
@@ -35,8 +36,8 @@ var storage = (function () {
             //it can be used as an indication of whether the game has just started
             var allEmpty = true;
             var gameData = this.data;
-            gameData.players.forEach(function (player) {
-                if (gameData.scores[player] !== 0) {
+            gameData.medications.forEach(function (medications) {
+                if (gameData.usages[medications] !== 0) { //MIGHT NEED TO DO '' INSTEAD OF 0
                     allEmpty = false;
                 }
             });
