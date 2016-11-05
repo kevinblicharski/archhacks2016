@@ -33,17 +33,50 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
               {
                 currentMedDuration = intent.slots.Duration.value;
                 var date = new Date();
-                for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
+                if(currentMedFrequency == "daily"){
+                  frequency = 1;
+                }
+                else if(currentMedFrequency == "every other day"){
+                  frequency = 2;
+                }
+                else{
+                  frequency = currentMedFrequency.split(' ')[1];
+                }
+
+                var dayCount;
+                var durationArray = currentMedDuration.split(' ');
+                if (durationArray.length == 1)
+                {
+                  switch durationArray[0] {
+                    case 'day':
+                      dayCount = 1;
+                      break;
+                    case 'week':
+                      dayCount = 7;
+                      break;
+                    case 'month':
+                      dayCount = 30;
+                      break;
+                    case 'year':
+                      dayCount = 365;
+                      break;
+                  }
+                }
+                else dayCount = duration[0];
+
+
+                for (var i = 0; i < dayCount; i += frequency)
                 {
                   var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
                     + currentMedFrequency;
                   var value = currentMedDosage + ';not taken';
                   medList.data.medications.push(key);
                   medList.data.dosages[key] = value;
-                  date.setDate(date.getDate() + 1);
+
+                  date.setDate(date.getDate() + frequency);
                 }
                 speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-                  + currentMedDuration + '.';
+                  + currentMedDuration + currentMedFrequency + '.';
               }
               else
               {
@@ -98,7 +131,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
     intentHandlers.GetFrequencyIntent = function (intent, session, response) {
       storage.loadMedList(session, function (medList) {
         var speechOutput, reprompt;
-
         currentMedFrequency = intent.slots.Frequency.value;
 
         speechOutput = 'How long will you be taking ' + currentMedName + '?';
@@ -107,7 +139,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         medList.save(function () {
           response.ask(speechOutput, reprompt);
         });
-
       });
     };
 
@@ -119,18 +150,39 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
           var speechOutput, frequency;
           currentMedDuration = intent.slots.Duration.value;
           var date = new Date();
-          
-          if(currentFrequencyValue == "daily"){
+
+          if(currentMedFrequency == "daily"){
             frequency = 1;
           }
-          else if(currentFrequencyValue == "every other day"){
+          else if(currentMedFrequency == "every other day"){
             frequency = 2;
           }
           else{
             frequency = currentMedFrequency.split(' ')[1];
           }
 
-          for (var i = 0; i < currentMedDuration.split(' ')[0]; i += frequency)
+          var dayCount;
+          var durationArray = currentMedDuration.split(' ');
+          if (durationArray.length == 1)
+          {
+            switch durationArray[0] {
+              case 'day':
+                dayCount = 1;
+                break;
+              case 'week':
+                dayCount = 7;
+                break;
+              case 'month':
+                dayCount = 30;
+                break;
+              case 'year':
+                dayCount = 365;
+                break;
+            }
+          }
+          else dayCount = duration[0];
+
+          for (var i = 0; i < dayCount; i += frequency)
           {
             var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
               + currentMedFrequency;
@@ -138,11 +190,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             medList.data.medications.push(key);
             medList.data.dosages[key] = value;
 
-
             date.setDate(date.getDate() + frequency);
           }
           speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-            + currentMedDuration + '.';
+            + currentMedDuration + currentMedFrequency + '.';
           medList.save(function () {
               response.tell(speechOutput);
           });
@@ -218,8 +269,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 speechOutput += ' You have no other medications to take today.';
               }
             });
-            response.tell(speechOutput);
-            medList.save(function () {
+             medList.save(function () {
                 response.tell(speechOutput);
             });
         });
