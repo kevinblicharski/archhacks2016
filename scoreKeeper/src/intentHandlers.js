@@ -97,12 +97,15 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
     */
     intentHandlers.GetFrequencyIntent = function (intent, session, response) {
       storage.loadMedList(session, function (medList) {
-        // code goes here
+        var speechOutput, reprompt;
+
+        currentMedFrequency = intent.slots.Frequency.value;
 
         speechOutput = 'How long will you be taking ' + currentMedName + '?';
         reprompt = 'How long will you be taking ' + currentMedName + '?';
+
         medList.save(function () {
-            response.ask(speechOutput, reprompt);
+          response.ask(speechOutput, reprompt);
         });
 
       });
@@ -113,17 +116,30 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
       storage.loadMedList(session, function (medList) {
-          var speechOutput;
+          var speechOutput, frequency;
           currentMedDuration = intent.slots.Duration.value;
           var date = new Date();
-          for (var i = 0; i < currentMedDuration.split(' ')[0]; ++i)
+          
+          if(currentFrequencyValue == "daily"){
+            frequency = 1;
+          }
+          else if(currentFrequencyValue == "every other day"){
+            frequency = 2;
+          }
+          else{
+            frequency = currentMedFrequency.split(' ')[1];
+          }
+
+          for (var i = 0; i < currentMedDuration.split(' ')[0]; i += frequency)
           {
             var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
               + currentMedFrequency;
             var value = currentMedDosage + ';not taken';
             medList.data.medications.push(key);
             medList.data.dosages[key] = value;
-            date.setDate(date.getDate() + 1);
+
+
+            date.setDate(date.getDate() + frequency);
           }
           speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
             + currentMedDuration + '.';
