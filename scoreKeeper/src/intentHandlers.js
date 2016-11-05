@@ -132,6 +132,13 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         });
     };
 
+    intentHandlers.SendEmailIntent = function (intent, session, response) {
+      storage.loadMedList(session, function (medList) {
+        // email shit goes Here
+
+      });
+    };
+
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players
         storage.loadMedList(session, function (medList) {
