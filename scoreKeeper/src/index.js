@@ -40,9 +40,9 @@
  *  Alexa: "Jeff has zero points and Bob has three"
  */
 'use strict';
-var ScoreKeeper = require('./scoreKeeper');
+var MedManager = require('./medManager');
 
 exports.handler = function (event, context) {
-    var scoreKeeper = new ScoreKeeper();
-    scoreKeeper.execute(event, context);
+    var medManager = new MedManager();
+    medManager.execute(event, context);
 };

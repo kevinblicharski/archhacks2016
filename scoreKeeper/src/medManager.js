@@ -22,17 +22,17 @@ var skillContext = {};
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Introduction_to_Object-Oriented_JavaScript#Inheritance
  */
-var ScoreKeeper = function () {
+var MedManager = function () {
     AlexaSkill.call(this, APP_ID);
     skillContext.needMoreHelp = true;
 };
 
 
 // Extend AlexaSkill
-ScoreKeeper.prototype = Object.create(AlexaSkill.prototype);
-ScoreKeeper.prototype.constructor = ScoreKeeper;
+MedManager.prototype = Object.create(AlexaSkill.prototype);
+MedManager.prototype.constructor = MedManager;
 
-eventHandlers.register(ScoreKeeper.prototype.eventHandlers, skillContext);
-intentHandlers.register(ScoreKeeper.prototype.intentHandlers, skillContext);
+eventHandlers.register(MedManager.prototype.eventHandlers, skillContext);
+intentHandlers.register(MedManager.prototype.intentHandlers, skillContext);
 
-module.exports = ScoreKeeper;
+module.exports = MedManager;
