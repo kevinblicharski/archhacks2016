@@ -147,18 +147,43 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
       storage.loadMedList(session, function (medList) {
-          var speechOutput, frequency;
+          var speechOutput, frequencyArray;
+          var frequency = 1;
+
           currentMedDuration = intent.slots.Duration.value;
           var date = new Date();
 
-          if(currentMedFrequency == "daily"){
+          if(currentMedFrequency === "daily"){
             frequency = 1;
           }
-          else if(currentMedFrequency == "every other day"){
+          else if(currentMedFrequency === "every other day"){
             frequency = 2;
           }
           else{
-            frequency = currentMedFrequency.split(' ')[1];
+            frequencyArray = currentMedFrequency.split(' ');
+
+            for(var i=0; i<frequencyArray.length; i++){
+
+              if(frequencyArray[i] === parseInt(frequencyArray[i], 10)){
+                frequency = frequencyArray[i];
+              }
+
+              if(frequencyArray[i] === "weekly" || frequencyArray[i] === "week" || frequencyArray[i] === "weeks"){
+                if(frequencyArray[i-1] === "other" ||){
+                  frequency *= 2;
+                }
+
+                frequency *= 7;
+              }
+
+              if(frequencyArray[i] === "monthly" || frequencyArray[i] === "month" || frequencyArray[i] === "months"){
+                if(frequencyArray[i-1] === "other" ||){
+                  frequency *= 2;
+                }
+
+                frequency *= 30;
+              }
+            }
           }
 
           var dayCount;
