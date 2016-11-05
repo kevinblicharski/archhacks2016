@@ -17,7 +17,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //add a player to the current game,
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
-      var newPlayerName = textHelper.getPlayerName(intent.slots.PlayerName.value);
+      var newPlayerName = textHelper.getMedName(intent.slots.PlayerName.value);
       if (!newPlayerName) {
           response.ask('OK. Who do you want to add?', 'Who do you want to add?');
           return;
@@ -101,7 +101,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         //add a player to the current game,
         //terminate or continue the conversation based on whether the intent
         //is from a one shot command or not.
-        var newPlayerName = textHelper.getPlayerName(intent.slots.PlayerName.value);
+        var newPlayerName = textHelper.getMedName(intent.slots.PlayerName.value);
         if (!newPlayerName) {
             response.ask('OK. Who do you want to add?', 'Who do you want to add?');
             return;
@@ -142,7 +142,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.AddScoreIntent = function (intent, session, response) {
         //give a player points, ask additional question if slot values are missing.
-        var playerName = textHelper.getPlayerName(intent.slots.PlayerName.value),
+        var playerName = textHelper.getMedName(intent.slots.PlayerName.value),
             score = intent.slots.ScoreNumber,
             scoreValue;
         if (!playerName) {
