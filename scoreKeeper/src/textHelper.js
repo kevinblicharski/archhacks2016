@@ -25,7 +25,22 @@ var textHelper = (function () {
         + ' , and exit.',
         nextHelp: 'You can give a drug a schedule, add a schedule, get the schedule for a drug, or say help. What would you like?',
 
+        formatDate: function () {
+          var today = new Date();
+          var dd = today.getDate();
+          var mm = today.getMonth()+1; //January is 0!
+          var yyyy = today.getFullYear();
 
+          if (dd < 10) {
+              dd = '0' + dd;
+          }
+
+          if (mm < 10) {
+              mm ='0'+ mm;
+          }
+
+          return yyyy + '-' + mm + '-' + dd;
+        }
 
         getMedName: function (recognizedMedName) {
             if (!recognizedMedName) {

@@ -24,7 +24,6 @@ var skillContext = {};
  */
 var MedManager = function () {
     AlexaSkill.call(this, APP_ID);
-    skillContext.needMoreHelp = true;
 };
 
 

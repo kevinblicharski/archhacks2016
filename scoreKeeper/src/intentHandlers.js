@@ -12,39 +12,47 @@
 var textHelper = require('./textHelper'),
     storage = require('./storage');
 
+var currentMedName = 'noooooo';
+var currentMedDosage = '2';
+var currentMedDuration = '5 days';
+
 var registerIntentHandlers = function (intentHandlers, skillContext) {
     intentHandlers.NewMedIntent = function (intent, session, response) {
       //add a player to the current game,
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
-      var newPlayerName = textHelper.getMedName(intent.slots.Medication.value);
-      if (!newPlayerName) {
-          response.ask('OK. Who do you want to add?', 'Who do you want to add?');
-          return;
-      }
+      currentMedName = textHelper.getMedName(intent.slots.Medication.value);
       storage.loadMedList(session, function (medListData) {
           var speechOutput,
               reprompt;
-          if (medListData.data.usages[newPlayerName] !== undefined) {
-              speechOutput = newPlayerName + ' has already joined the game.';
-              if (skillContext.needMoreHelp) {
-                  response.ask(speechOutput + ' What else?', 'What else?');
-              } else {
-                  response.tell(speechOutput);
+          if (intent.slots.Dosage.value != null)
+          {
+            currentMedDosage = intent.slots.Dosage.value;
+            if (intent.slots.Duration.value != null)
+            {
+              currentMedDuration = intent.slots.Duration.value;
+              var date = textHelper.getDate();
+              for (var i = 0; i < currentMedDuration; ++i)
+              {
+
               }
-              return;
+              var key = currentMedName + ';' + currentMedDuration;
+              var value = currentMedDosage + ';not taken';
+              medListData.data.medications.push(currentMedName);
+              medListData.data.usages[currentMedName] = value;
+              speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
+                + currentMedDuration;
+            }
+            else
+            {
+              speechOutput = 'How long will you be taking ' + currentMedName + '?';
+              reprompt = 'How long will you be taking ' + currentMedName + '?';
+            }
           }
-          speechOutput = newPlayerName + ' has joined your game. ';
-          medListData.data.medications.push(newPlayerName);
-          medListData.data.usages[newPlayerName] = 0;
-          if (skillContext.needMoreHelp) {
-              if (medListData.data.medications.length == 1) {
-                  speechOutput += 'You can say, I am Done Adding Players. Now who\'s your next player?';
-                  reprompt = textHelper.nextHelp;
-              } else {
-                  speechOutput += 'Who is your next player?';
-                  reprompt = textHelper.nextHelp;
-              }
+          else
+          {
+            speechOutput = 'How much ' + currentMedName + ' will you be taking?';
+            reprompt = 'How much ' + currentMedName + ' will you be taking?';
           }
           medListData.save(function () {
               if (reprompt) {
@@ -61,7 +69,20 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
     };
 
     intentHandlers.GetMedsIntent = function (intent, session, response) {
-
+        var speechOutput = 'Today you need to take the following medications: ';
+        var currentDate = textHelper.formatDate(new Date());
+        medListData.data.medications.forEach(function (med)
+          var parsedKey = textHelper.parseMedKey(med);
+          if (parsedKey[1] === currentDate)
+          {
+            var todayMed = textHelper.parseMedValue(medListData.data.scores[med]);
+            if (todayMed.length == 1 || todayMed[1] = "not taken")
+            {
+              speechOutput += todayMed[0] + " of " + parsedKey + ", ";
+            }
+          }
+        )
+        response.tell(speechOutput);
     };
 
     intentHandlers.MedTakenEvent = function (intent, session, response) {
