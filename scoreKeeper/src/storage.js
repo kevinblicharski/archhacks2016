@@ -24,7 +24,7 @@ var storage = (function () {
             this.data = {
                 medications: [],
                 usages: {}
-                
+
             };
         }
         this._session = session;
@@ -48,9 +48,9 @@ var storage = (function () {
             //so next time we can save a read from dynamoDB
             this._session.attributes.currentGame = this.data;
             dynamodb.putItem({
-                TableName: 'MedManagerUserData',
+                TableName: 'MedManagerMedicationTable',
                 Item: {
-                    UserId: {
+                    MedicationId: {
                         S: this._session.user.userId
                     },
                     Data: {
@@ -76,9 +76,9 @@ var storage = (function () {
                 return;
             }
             dynamodb.getItem({
-                TableName: 'MedManagerUserData',
+                TableName: 'MedManagerMedicationTable',
                 Key: {
-                    UserId: {
+                    MedicationId: {
                         S: session.user.userId
                     }
                 }
