@@ -14,7 +14,7 @@ var storage = (function () {
     /*
      * The Game class stores all game states for the user
      */
-    function Game(session, data) {
+    function MedList(session, data) {
         if (data) {
             this.data = data;
         } else {
@@ -26,14 +26,14 @@ var storage = (function () {
         this._session = session;
     }
 
-    Game.prototype = {
+    MedList.prototype = {
         isEmptyScore: function () {
             //check if any one had non-zero score,
             //it can be used as an indication of whether the game has just started
             var allEmpty = true;
-            var gameData = this.data;
-            gameData.medications.forEach(function (medication) {
-                if (gameData.usages[medication] !== 0) {
+            var medListData = this.data;
+            medListData.medications.forEach(function (medication) {
+                if (medListData.usages[medication] !== 0) {
                     allEmpty = false;
                 }
             });
@@ -42,7 +42,7 @@ var storage = (function () {
         save: function (callback) {
             //save the game states in the session,
             //so next time we can save a read from dynamoDB
-            this._session.attributes.currentGame = this.data;
+            this._session.attributes.medListData = this.data;
             dynamodb.putItem({
                 TableName: 'MedManagerMedicationTable',
                 Item: {
@@ -65,10 +65,10 @@ var storage = (function () {
     };
 
     return {
-        loadGame: function (session, callback) {
-            if (session.attributes.currentGame) {
-                console.log('get game from session=' + session.attributes.currentGame);
-                callback(new Game(session, session.attributes.currentGame));
+        loadMedList: function (session, callback) {
+            if (session.attributes.medListData) {
+                console.log('get medList from session=' + session.attributes.medListData);
+                callback(new MedList(session, session.attributes.medListData));
                 return;
             }
             dynamodb.getItem({
@@ -79,26 +79,26 @@ var storage = (function () {
                     }
                 }
             }, function (err, data) {
-                var currentGame;
+                var medListData;
                 if (err) {
                     console.log(err, err.stack);
-                    currentGame = new Game(session);
-                    session.attributes.currentGame = currentGame.data;
-                    callback(currentGame);
+                    medListData = new MedList(session);
+                    session.attributes.medListData = medListData.data;
+                    callback(medListData);
                 } else if (data.Item === undefined) {
-                    currentGame = new Game(session);
-                    session.attributes.currentGame = currentGame.data;
-                    callback(currentGame);
+                    medListData = new MedList(session);
+                    session.attributes.medListData = medListData.data;
+                    callback(medListData);
                 } else {
-                    console.log('get game from dynamodb=' + data.Item.Data.S);
-                    currentGame = new Game(session, JSON.parse(data.Item.Data.S));
-                    session.attributes.currentGame = currentGame.data;
-                    callback(currentGame);
+                    console.log('get medList from dynamodb=' + data.Item.Data.S);
+                    medListData = new MedList(session, JSON.parse(data.Item.Data.S));
+                    session.attributes.medListData = medListData.data;
+                    callback(medListData);
                 }
             });
         },
         newGame: function (session) {
-            return new Game(session);
+            return new MedList(session);
         }
     };
 })();

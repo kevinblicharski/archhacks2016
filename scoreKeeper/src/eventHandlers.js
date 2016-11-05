@@ -22,16 +22,16 @@ var registerEventHandlers = function (eventHandlers, skillContext) {
     eventHandlers.onLaunch = function (launchRequest, session, response) {
         //Speak welcome message and ask user questions
         //based on whether there are players or not.
-        storage.loadGame(session, function (currentGame) {
+        storage.loadMedList(session, function (medListData) {
             var speechOutput = '',
                 reprompt;
-            if (currentGame.data.medications.length === 0) {
+            if (medListData.data.medications.length === 0) {
                 speechOutput += 'ScoreKeeper, Let\'s start your game. Who\'s your first player?';
                 reprompt = "Please tell me who is your first player?";
-            } else if (currentGame.isEmptyScore()) {
+            } else if (medListData.isEmptyScore()) {
                 speechOutput += 'ScoreKeeper, '
-                    + 'you have ' + currentGame.data.medications.length + ' player';
-                if (currentGame.data.medications.length > 1) {
+                    + 'you have ' + medListData.data.medications.length + ' player';
+                if (medListData.data.medications.length > 1) {
                     speechOutput += 's';
                 }
                 speechOutput += ' in the game. You can give a player points, add another player, reset all players or exit. Which would you like?';

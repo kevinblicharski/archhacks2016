@@ -22,10 +22,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
           response.ask('OK. Who do you want to add?', 'Who do you want to add?');
           return;
       }
-      storage.loadGame(session, function (currentGame) {
+      storage.loadMedList(session, function (medListData) {
           var speechOutput,
               reprompt;
-          if (currentGame.data.usages[newPlayerName] !== undefined) {
+          if (medListData.data.usages[newPlayerName] !== undefined) {
               speechOutput = newPlayerName + ' has already joined the game.';
               if (skillContext.needMoreHelp) {
                   response.ask(speechOutput + ' What else?', 'What else?');
@@ -35,10 +35,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
               return;
           }
           speechOutput = newPlayerName + ' has joined your game. ';
-          currentGame.data.medications.push(newPlayerName);
-          currentGame.data.usages[newPlayerName] = 0;
+          medListData.data.medications.push(newPlayerName);
+          medListData.data.usages[newPlayerName] = 0;
           if (skillContext.needMoreHelp) {
-              if (currentGame.data.medications.length == 1) {
+              if (medListData.data.medications.length == 1) {
                   speechOutput += 'You can say, I am Done Adding Players. Now who\'s your next player?';
                   reprompt = textHelper.nextHelp;
               } else {
@@ -46,7 +46,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                   reprompt = textHelper.nextHelp;
               }
           }
-          currentGame.save(function () {
+          medListData.save(function () {
               if (reprompt) {
                   response.ask(speechOutput, reprompt);
               } else {
@@ -70,19 +70,19 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players
-        storage.loadGame(session, function (currentGame) {
-            if (currentGame.data.players.length === 0) {
+        storage.loadMedList(session, function (medListData) {
+            if (medListData.data.players.length === 0) {
                 response.ask('New game started. Who\'s your first player?',
                     'Please tell me who\'s your first player?');
                 return;
             }
-            currentGame.data.players.forEach(function (player) {
-                currentGame.data.scores[player] = 0;
+            medListData.data.players.forEach(function (player) {
+                medListData.data.scores[player] = 0;
             });
-            currentGame.save(function () {
+            medListData.save(function () {
                 var speechOutput = 'New game started with '
-                    + currentGame.data.players.length + ' existing player';
-                if (currentGame.data.players.length > 1) {
+                    + medListData.data.players.length + ' existing player';
+                if (medListData.data.players.length > 1) {
                     speechOutput += 's';
                 }
                 speechOutput += '.';
@@ -106,10 +106,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             response.ask('OK. Who do you want to add?', 'Who do you want to add?');
             return;
         }
-        storage.loadGame(session, function (currentGame) {
+        storage.loadMedList(session, function (medListData) {
             var speechOutput,
                 reprompt;
-            if (currentGame.data.scores[newPlayerName] !== undefined) {
+            if (medListData.data.scores[newPlayerName] !== undefined) {
                 speechOutput = newPlayerName + ' has already joined the game.';
                 if (skillContext.needMoreHelp) {
                     response.ask(speechOutput + ' What else?', 'What else?');
@@ -119,10 +119,10 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 return;
             }
             speechOutput = newPlayerName + ' has joined your game. ';
-            currentGame.data.players.push(newPlayerName);
-            currentGame.data.scores[newPlayerName] = 0;
+            medListData.data.players.push(newPlayerName);
+            medListData.data.scores[newPlayerName] = 0;
             if (skillContext.needMoreHelp) {
-                if (currentGame.data.players.length == 1) {
+                if (medListData.data.players.length == 1) {
                     speechOutput += 'You can say, I am Done Adding Players. Now who\'s your next player?';
                     reprompt = textHelper.nextHelp;
                 } else {
@@ -130,7 +130,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                     reprompt = textHelper.nextHelp;
                 }
             }
-            currentGame.save(function () {
+            medListData.save(function () {
                 if (reprompt) {
                     response.ask(speechOutput, reprompt);
                 } else {
@@ -155,15 +155,15 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             response.ask('sorry, I did not hear the points, please say that again', 'please say the points again');
             return;
         }
-        storage.loadGame(session, function (currentGame) {
+        storage.loadMedList(session, function (medListData) {
             var targetPlayer, speechOutput = '', newScore;
-            if (currentGame.data.players.length < 1) {
+            if (medListData.data.players.length < 1) {
                 response.ask('sorry, no player has joined the game yet, what can I do for you?', 'what can I do for you?');
                 return;
             }
-            for (var i = 0; i < currentGame.data.players.length; i++) {
-                if (currentGame.data.players[i] === playerName) {
-                    targetPlayer = currentGame.data.players[i];
+            for (var i = 0; i < medListData.data.players.length; i++) {
+                if (medListData.data.players[i] === playerName) {
+                    targetPlayer = medListData.data.players[i];
                     break;
                 }
             }
@@ -171,23 +171,23 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 response.ask('Sorry, ' + playerName + ' has not joined the game. What else?', playerName + ' has not joined the game. What else?');
                 return;
             }
-            newScore = currentGame.data.scores[targetPlayer] + scoreValue;
-            currentGame.data.scores[targetPlayer] = newScore;
+            newScore = medListData.data.scores[targetPlayer] + scoreValue;
+            medListData.data.scores[targetPlayer] = newScore;
 
             speechOutput += scoreValue + ' for ' + targetPlayer + '. ';
-            if (currentGame.data.players.length == 1 || currentGame.data.players.length > 3) {
+            if (medListData.data.players.length == 1 || medListData.data.players.length > 3) {
                 speechOutput += targetPlayer + ' has ' + newScore + ' in total.';
             } else {
                 speechOutput += 'That\'s ';
-                currentGame.data.players.forEach(function (player, index) {
-                    if (index === currentGame.data.players.length - 1) {
+                medListData.data.players.forEach(function (player, index) {
+                    if (index === medListData.data.players.length - 1) {
                         speechOutput += 'And ';
                     }
-                    speechOutput += player + ', ' + currentGame.data.scores[player];
+                    speechOutput += player + ', ' + medListData.data.scores[player];
                     speechOutput += ', ';
                 });
             }
-            currentGame.save(function () {
+            medListData.save(function () {
                 response.tell(speechOutput);
             });
         });
@@ -195,18 +195,18 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
     intentHandlers.TellScoresIntent = function (intent, session, response) {
         //tells the scores in the leaderboard and send the result in card.
-        storage.loadGame(session, function (currentGame) {
+        storage.loadMedList(session, function (medListData) {
             var sortedPlayerScores = [],
                 continueSession,
                 speechOutput = '',
                 leaderboard = '';
-            if (currentGame.data.players.length === 0) {
+            if (medListData.data.players.length === 0) {
                 response.tell('Nobody has joined the game.');
                 return;
             }
-            currentGame.data.players.forEach(function (player) {
+            medListData.data.players.forEach(function (player) {
                 sortedPlayerScores.push({
-                    score: currentGame.data.scores[player],
+                    score: medListData.data.scores[player],
                     player: player
                 });
             });
