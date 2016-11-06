@@ -1,0 +1,71 @@
+NewMedIntent add {Medication}
+NewMedIntent add {Medication} to my schedule
+NewMedIntent add {Medication} to my medications
+NewMedIntent add {Dosage} of {Medication}
+NewMedIntent add {Dosage} of {Medication} to my schedule
+NewMedIntent add {Dosage} of {Medication} to my medications
+NewMedIntent add {Dosage} of {Medication} for {Duration}
+NewMedIntent add {Dosage} of {Medication} to my schedule for {Duration}
+NewMedIntent add {Dosage} of {Medication} to my medications for {Duration}
+NewMedIntent add {Dosage} of {Medication} for {Duration} to be taken {Frequency}
+NewMedIntent add {Dosage} of {Medication} to my schedule for {Duration} to be taken {Frequency}
+NewMedIntent add {Dosage} of {Medication} to my medications for {Duration} to be taken {Frequency}
+NewMedIntent I am taking {Medication} now
+NewMedIntent I am taking {Dosage} of {Medication} for {Duration}
+NewMedIntent I am taking {Medication} for {Duration}
+
+GetDosageIntent {Dosage}
+GetDosageIntent I need to take {Dosage}
+GetDosageIntent I need to take {Dosage} every day
+
+GetDurationIntent {Duration}
+GetDurationIntent for {Duration}
+GetDurationIntent for the next {Duration}
+GetDurationIntent for another {Duration}
+
+
+MarkTakenIntent I took my {Medication}
+MarkTakenIntent I took my {Medication} today
+MarkTakenIntent I took the {Medication}
+MarkTakenIntent I took the {Medication} today
+MarkTakenIntent took my {Medication}
+MarkTakenIntent took the {Medication}
+
+
+
+GetMedsIntent tell me what meds I need to take
+GetMedsIntent tell me what meds I need to take today
+GetMedsIntent for my meds
+GetMedsIntent what I need to take
+GetMedsIntent what I need to take today
+GetMedsIntent what do I need to take
+GetMedsIntent what do I need to take today
+
+MedTakenIntent I took {Medication}
+MedTakenIntent I took my {Medication}
+MedTakenIntent I took my daily {Medication}
+MedTakenIntent I have taken my {Medication}
+MedTakenIntent I have taken my daily {Medication}
+
+
+GetFrequencyIntent {Frequency}
+GetFrequencyIntent I will be taking it {Frequency}
+
+ReportIntent tell me my report for {MedDate}
+ReportIntent report for {MedDate}
+ReportIntent what happened on {MedDate}
+ReportIntent for a report for {MedDate}
+ReportIntent for a report on {MedDate}
+ReportIntent give me a report for {MedDate}
+
+PrepareIntent tell me my meds for {MedDate}
+PrepareIntent tell me my medications for {MedDate}
+PrepareIntent tell me what I am taking on {MedDate}
+PrepareIntent report for {MedDate}
+PrepareIntent what am I taking on {MedDate}
+PrepareIntent what I am taking on {MedDate}
+PrepareIntent list off my meds for {MedDate}
+PrepareIntent list off my medications for {MedDate}
+PrepareIntent for a list of my meds for {MedDate}
+
+ResetRecordIntent emergency reset for demo purposes

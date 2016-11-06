@@ -1,0 +1,103 @@
+{
+  "intents": [
+    {
+      "intent": "NewMedIntent",
+      "slots": [
+        {
+          "name": "Medication",
+          "type": "LIST_OF_MEDICATIONS"
+        },
+        {
+          "name": "Dosage",
+          "type": "LIST_OF_DOSAGES"
+        },
+        {
+          "name": "Frequency",
+          "type": "LIST_OF_FREQUENCIES"
+        },
+        {
+          "name": "Duration",
+          "type": "LIST_OF_DURATIONS"
+        }
+      ]
+    },
+    {
+      "intent": "GetMedsIntent"
+    },
+    {
+      "intent": "MedTakenIntent",
+      "slots": [
+        {
+          "name": "Medication",
+          "type": "LIST_OF_MEDICATIONS"
+        }
+      ]
+    },
+    {
+      "intent": "GetDosageIntent",
+      "slots": [
+        {
+          "name": "Dosage",
+          "type": "LIST_OF_DOSAGES"
+        }
+      ]
+    },
+    {
+      "intent": "GetFrequencyIntent",
+      "slots": [
+        {
+          "name": "Frequency",
+          "type": "LIST_OF_FREQUENCIES"
+        }
+      ]
+    },
+    {
+      "intent": "GetDurationIntent",
+      "slots": [
+        {
+          "name": "Duration",
+          "type": "LIST_OF_DURATIONS"
+        }
+      ]
+    },
+    {
+      "intent": "MarkTakenIntent",
+      "slots": [
+        {
+          "name": "Medication",
+          "type": "LIST_OF_MEDICATIONS"
+        }
+      ]
+    },
+    {
+      "intent": "ReportIntent",
+      "slots": [
+        {
+          "name": "MedDate",
+          "type": "AMAZON.DATE"
+        }
+      ]
+    },
+    {
+      "intent": "PrepareIntent",
+      "slots": [
+        {
+          "name": "MedDate",
+          "type": "AMAZON.DATE"
+        }
+      ]
+    },
+    {
+      "intent": "ResetRecordIntent"
+    },
+    {
+      "intent": "AMAZON.HelpIntent"
+    },
+    {
+      "intent": "AMAZON.StopIntent"
+    },
+    {
+      "intent": "AMAZON.CancelIntent"
+    }
+  ]
+}
