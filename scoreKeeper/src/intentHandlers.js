@@ -179,12 +179,19 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         storage.loadMedList(session, function (medList) {
             var speechOutput;
             var medName = intent.slots.Medication.value;
-            var date = textHelper.formatDate(new Date());
-            var key = medName + ';' + date;
-            var value = medList.data.dosages[key].split(';');
+            var currentDate = textHelper.formatDate(new Date());
+            var keyPrefix = medName + ';' + currentDate;
+            medList.data.medications.forEach( function (med) {
+              if (med.includes(keyPrefix))
+              {
+                keyPrefix = med;
+              }
+            });
+            var value = medList.data.dosages[keyPrefix].split(';');
             value[1] = "taken";
-            medList.data.dosages[key] = value.join(';');
+            medList.data.dosages[keyPrefix] = value.join(';');
             speechOutput = 'Great job taking your ' + medName + '.';
+            var medListCopy = [];
             medList.data.medications.forEach(function (med) {
                 medListCopy.push({
                     dosage: medList.data.dosages[med],
@@ -208,11 +215,11 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                   speechOutput += (todayMed[0] + ' of ' + parsedKey[0] + '. ');
                 }
               }
-              if (!anythingLeftToTake)
-              {
-                speechOutput += ' You have no other medications to take today.';
-              }
             });
+            if (!anythingLeftToTake)
+            {
+              speechOutput += ' You have no other medications to take today.';
+            }
              medList.save(function () {
                 response.tell(speechOutput);
             });
