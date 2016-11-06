@@ -175,7 +175,12 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         });
     };
 
-<<<<<<< Updated upstream
+    intentHandlers.GetTODIntent = function (intent, session, response) {
+      storage.loadMedList(session, function (medList) {
+
+      }
+    };
+
     intentHandlers.MarkTakenIntent = function (intent, session, response) {
         storage.loadMedList(session, function (medList) {
             var speechOutput;
@@ -225,18 +230,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 response.tell(speechOutput);
             });
         });
-=======
-    intentHandlers.SendEmailIntent = function (intent, session, response) {
-      storage.loadMedList(session, function (medList) {
-        // email shit goes Here
-
-
-
-
-
-      });
->>>>>>> Stashed changes
-    };
 
     intentHandlers.ReportIntent = function (intent, session, response) {
       storage.loadMedList(session, function (medList) {
