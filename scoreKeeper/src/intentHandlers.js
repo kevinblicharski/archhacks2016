@@ -148,10 +148,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         storage.loadMedList(session, function (medList) {
             var medListCopy = [],
                 speechOutput = 'You need to take the following today. ';
-            if (medList.data.medications.length === 0) {
-                response.tell('You have no medications to take today.');
-                return;
-            }
             medList.data.medications.forEach(function (med) {
                 medListCopy.push({
                     dosage: medList.data.dosages[med],
@@ -159,18 +155,19 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 });
             });
             var currentDate = textHelper.formatDate(new Date());
-            medListCopy.forEach(function (med)
+            var medsToTakeToday = medicationHelper.getMissedMedicationsForDate(currentDate, medListCopy);
+            if (medsToTakeToday.length == 0)
             {
-              var parsedKey = med.name.split(';');
-              if (parsedKey[1] === currentDate)
-              {
-                var todayMed = med.dosage.split(';');
-                if (todayMed.length == 1 || todayMed[1] == 'not taken')
-                {
-                  speechOutput += (todayMed[0] + ' of ' + parsedKey[0] + '. ');
-                }
-              }
-            });
+              speechOutput = 'You have no more medications to take today.';
+            }
+            else
+            {
+              medsToTakeToday.forEach(function (med) {
+                var keySplit = med.name.split(';');
+                var valueSplit = med.dosage.split(';');
+                speechOutput += (valueSplit[0] + ' of ' + keySplit[0] + '. ');
+              });
+            }
             response.tell(speechOutput);
         });
     };
@@ -204,27 +201,18 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                     name: med
                 });
             });
-            var anythingLeftToTake = false;
-            medListCopy.forEach(function (med)
+            var medsToTakeToday = medicationHelper.getMissedMedicationsForDate(currentDate, medListCopy);
+            if (medsToTakeToday.length == 0)
             {
-              var parsedKey = med.name.split(';');
-              if (parsedKey[1] === currentDate)
-              {
-                var todayMed = med.dosage.split(';');
-                if (todayMed.length == 1 || todayMed[1] == 'not taken')
-                {
-                  if (!anythingLeftToTake)
-                  {
-                    speechOutput += ' You still need to take the following. ';
-                    anythingLeftToTake = true;
-                  }
-                  speechOutput += (todayMed[0] + ' of ' + parsedKey[0] + '. ');
-                }
-              }
-            });
-            if (!anythingLeftToTake)
+              speechOutput = ' You have no more medications to take today.';
+            }
+            else
             {
-              speechOutput += ' You have no other medications to take today.';
+              medsToTakeToday.forEach(function (med) {
+                var keySplit = med.name.split(';');
+                var valueSplit = med.dosage.split(';');
+                speechOutput += (valueSplit[0] + ' of ' + keySplit[0] + '. ');
+              });
             }
              medList.save(function () {
                 response.tell(speechOutput);
