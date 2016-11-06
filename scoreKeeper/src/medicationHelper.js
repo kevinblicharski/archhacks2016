@@ -12,36 +12,27 @@ var medicationHelper = (function () {
         getFrequency: function (frequencyString) {
             var frequency = 1;
 
-            if(frequencyString === "daily"){
-              return 1;
-            }
-            else if(frequencyString === "every other day"){
-              return 2;
-            }
-            else{
-              var frequencyArray = frequencyString.split(' ');
+            var frequencyArray = frequencyString.split(' ');
 
-              for(var i=0; i<frequencyArray.length; i++){
+            for(var i=0; i<frequencyArray.length; i++){
 
-                if(frequencyArray[i] === parseInt(frequencyArray[i], 10)){
-                  frequency = frequencyArray[i];
-                }
+              if(i > 0 && frequencyArray[i-1] === 'other'){
+                frequency *= 2;
+              }
 
-                else if(frequencyArray[i].contains('week')){
-                  if(i > 0 && frequencyArray[i-1] === 'other'){
-                    frequency *= 2;
-                  }
+              if(frequencyArray[i] === parseInt(frequencyArray[i], 10)){
+                frequency = frequencyArray[i];
+              }
 
-                  frequency *= 7;
-                }
+              else if(frequencyArray[i].contains('week')){
+                frequency *= 7;
+              }
 
-                else if(frequencyArray[i].contains('month')){
-                  if(i > 0 && frequencyArray[i-1] === 'other'){
-                    frequency *= 2;
-                  }
-
-                  frequency *= 30;
-                }
+              else if(frequencyArray[i].contains('month')){
+                frequency *= 30;
+              }
+              else if(frequencyArray[i].contains('year')){
+                frequency *= 365;
               }
             }
             return frequency;
