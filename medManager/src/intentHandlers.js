@@ -22,8 +22,8 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //is from a one shot command or not.
       currentMedName = intent.slots.Medication.value;
       storage.loadMedList(session, function (medList) {
-          var speechOutput,
-              reprompt;
+          var speechOutput = '';
+          var reprompt;
           if (intent.slots.Dosage.value != null)
           {
             currentMedDosage = intent.slots.Dosage.value;
@@ -47,7 +47,12 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             {
               key = currentMedName + ';' + textHelper.formatDate(medDate);
               value = currentMedDosage + ';not taken';
-              if (medList.data.dosages[key] == undefined)
+              if (medList.data.dosages[key])
+              {
+                speechOutput = 'You are already scheduled to take ' + currentMedName + '. '
+                  + 'You\'re schedule will be updated.  ';
+              }
+              else
               {
                 medList.data.medications.push(key);
               }
@@ -55,7 +60,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
 
               medDate.setDate(medDate.getDate() + frequency);
             }
-            speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
+            speechOutput += currentMedDosage + ' of ' + currentMedName + ' added for '
               + currentMedDuration + ' to be taken ' + currentMedFrequency + '.';
             currentMedName = '';
             currentMedDosage = '';
@@ -140,11 +145,15 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
           {
             key = currentMedName + ';' + textHelper.formatDate(medDate);
             value = currentMedDosage + ';not taken';
-            if (medList.data.dosages[key] == undefined)
+            if (medList.data.dosages[key])
+            {
+              speechOutput = 'You are already scheduled to take ' + currentMedName + '. '
+                + 'You\'re schedule will be updated.  ';
+            }
+            else
             {
               medList.data.medications.push(key);
             }
-            medList.data.medications.push(key);
             medList.data.dosages[key] = value;
 
             medDate.setDate(medDate.getDate() + frequency);
