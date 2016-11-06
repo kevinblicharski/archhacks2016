@@ -7,7 +7,8 @@
 
 'use strict';
 var textHelper = require('./textHelper'),
-    storage = require('./storage');
+    storage = require('./storage'),
+    medicationHelper = require('./medicationHelper');
 
 var currentMedName;
 var currentMedDosage;
@@ -33,37 +34,8 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
               {
                 currentMedDuration = intent.slots.Duration.value;
                 var date = new Date();
-                if(currentMedFrequency == "daily"){
-                  frequency = 1;
-                }
-                else if(currentMedFrequency == "every other day"){
-                  frequency = 2;
-                }
-                else{
-                  frequency = currentMedFrequency.split(' ')[1];
-                }
-
-                var dayCount;
-                var durationArray = currentMedDuration.split(' ');
-                if (durationArray.length == 1)
-                {
-                  switch durationArray[0] {
-                    case 'day':
-                      dayCount = 1;
-                      break;
-                    case 'week':
-                      dayCount = 7;
-                      break;
-                    case 'month':
-                      dayCount = 30;
-                      break;
-                    case 'year':
-                      dayCount = 365;
-                      break;
-                  }
-                }
-                else dayCount = duration[0];
-
+                var frequency = medicationHelper.getFrequency(currentMedFrequency);
+                var dayCount = medicationHelper.getDayCount(currentMedDuration);
 
                 for (var i = 0; i < dayCount; i += frequency)
                 {
@@ -147,65 +119,12 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
       storage.loadMedList(session, function (medList) {
-          var speechOutput, frequencyArray;
-          var frequency = 1;
+          var speechOutput;
 
           currentMedDuration = intent.slots.Duration.value;
           var date = new Date();
-
-          if(currentMedFrequency === "daily"){
-            frequency = 1;
-          }
-          else if(currentMedFrequency === "every other day"){
-            frequency = 2;
-          }
-          else{
-            frequencyArray = currentMedFrequency.split(' ');
-
-            for(var i=0; i<frequencyArray.length; i++){
-
-              if(frequencyArray[i] === parseInt(frequencyArray[i], 10)){
-                frequency = frequencyArray[i];
-              }
-
-              if(frequencyArray[i] === "weekly" || frequencyArray[i] === "week" || frequencyArray[i] === "weeks"){
-                if(frequencyArray[i-1] === "other" ||){
-                  frequency *= 2;
-                }
-
-                frequency *= 7;
-              }
-
-              if(frequencyArray[i] === "monthly" || frequencyArray[i] === "month" || frequencyArray[i] === "months"){
-                if(frequencyArray[i-1] === "other" ||){
-                  frequency *= 2;
-                }
-
-                frequency *= 30;
-              }
-            }
-          }
-
-          var dayCount;
-          var durationArray = currentMedDuration.split(' ');
-          if (durationArray.length == 1)
-          {
-            switch durationArray[0] {
-              case 'day':
-                dayCount = 1;
-                break;
-              case 'week':
-                dayCount = 7;
-                break;
-              case 'month':
-                dayCount = 30;
-                break;
-              case 'year':
-                dayCount = 365;
-                break;
-            }
-          }
-          else dayCount = duration[0];
+          var frequency = medicationHelper.getFrequency(currentMedFrequency);
+          var dayCount = medicationHelper.getDayCount(currentMedDuration);
 
           for (var i = 0; i < dayCount; i += frequency)
           {
@@ -218,7 +137,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             date.setDate(date.getDate() + frequency);
           }
           speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-            + currentMedDuration + currentMedFrequency + '.';
+            + currentMedDuration + ' ' + currentMedFrequency + '.';
           medList.save(function () {
               response.tell(speechOutput);
           });
