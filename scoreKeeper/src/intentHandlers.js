@@ -225,22 +225,20 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 response.tell(speechOutput);
             });
         });
-=======
-    intentHandlers.SendEmailIntent = function (intent, session, response) {
-      storage.loadMedList(session, function (medList) {
-        // email shit goes Here
-
-
-
-
-
-      });
->>>>>>> Stashed changes
-    };
 
     intentHandlers.ReportIntent = function (intent, session, response) {
       storage.loadMedList(session, function (medList) {
-        // code goes Here
+        // code that will break program goes here
+        var speechOutput = 'You missed the following medications.';
+        var currentDate = textHelper.formatDate(new Date());
+        var missedMeds = getPreviouslyMissedMedications(currentDate,medList.data.medications);
+
+        medListCopy.forEach(function (med) {
+          var parsedMed = med.name.split(';');
+          var parsedDosage = med.dosage.split(';');
+          speechOutput += parsedDosage[0] + ' of ' + parsedMed[0] + ' not taken on ' + parsedMed[1] + ' in the ' + parsedMed[2] + '. ';
+        });
+        response.tell(speechOutput);//get rekt
       });
     };
 
