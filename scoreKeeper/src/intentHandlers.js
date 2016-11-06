@@ -175,7 +175,12 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         });
     };
 
-<<<<<<< Updated upstream
+    // intentHandlers.GetTODIntent = function (intent, session, response) {
+    //   storage.loadMedList(session, function (medList) {
+    //
+    //   }
+    // };
+
     intentHandlers.MarkTakenIntent = function (intent, session, response) {
         storage.loadMedList(session, function (medList) {
             var speechOutput;
@@ -226,6 +231,7 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             });
         });
 
+<<<<<<< HEAD
     intentHandlers.ReportIntent = function (intent, session, response) {
       storage.loadMedList(session, function (medList) {
         // code that will break program goes here
@@ -241,6 +247,13 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         response.tell(speechOutput);//get rekt
       });
     };
+=======
+    // intentHandlers.ReportIntent = function (intent, session, response) {
+    //   storage.loadMedList(session, function (medList) {
+    //     // code goes Here
+    //   });
+    // };
+>>>>>>> origin/master
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players
