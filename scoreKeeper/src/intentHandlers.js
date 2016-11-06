@@ -175,11 +175,11 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         });
     };
 
-    intentHandlers.GetTODIntent = function (intent, session, response) {
-      storage.loadMedList(session, function (medList) {
-
-      }
-    };
+    // intentHandlers.GetTODIntent = function (intent, session, response) {
+    //   storage.loadMedList(session, function (medList) {
+    //
+    //   }
+    // };
 
     intentHandlers.MarkTakenIntent = function (intent, session, response) {
         storage.loadMedList(session, function (medList) {
@@ -231,11 +231,11 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             });
         });
 
-    intentHandlers.ReportIntent = function (intent, session, response) {
-      storage.loadMedList(session, function (medList) {
-        // code goes Here
-      });
-    };
+    // intentHandlers.ReportIntent = function (intent, session, response) {
+    //   storage.loadMedList(session, function (medList) {
+    //     // code goes Here
+    //   });
+    // };
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players
