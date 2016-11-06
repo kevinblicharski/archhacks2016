@@ -33,22 +33,21 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
               if (intent.slots.Duration.value != null)
               {
                 currentMedDuration = intent.slots.Duration.value;
-                var date = new Date();
-                var frequency = medicationHelper.getFrequency(currentMedFrequency);
-                var dayCount = medicationHelper.getDayCount(currentMedDuration);
-
+                var medDate = new Date();
+                var frequency = parseInt(medicationHelper.getFrequency(currentMedFrequency),10);
+                var dayCount = parseInt(medicationHelper.getDayCount(currentMedDuration),10);
+                var key, value;
                 for (var i = 0; i < dayCount; i += frequency)
                 {
-                  var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
-                    + currentMedFrequency;
-                  var value = currentMedDosage + ';not taken';
+                  key = currentMedName + ';' + textHelper.formatDate(medDate);
+                  value = currentMedDosage + ';not taken';
                   medList.data.medications.push(key);
                   medList.data.dosages[key] = value;
 
-                  date.setDate(date.getDate() + frequency);
+                  medDate.setDate(medDate.getDate() + frequency);
                 }
                 speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-                  + currentMedDuration + currentMedFrequency + '.';
+                  + currentMedDuration + ' taken ' + currentMedFrequency + '.';
               }
               else
               {
@@ -119,25 +118,24 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
       storage.loadMedList(session, function (medList) {
-          var speechOutput;
+          var speechOutput = '';
 
           currentMedDuration = intent.slots.Duration.value;
-          var date = new Date();
-          var frequency = medicationHelper.getFrequency(currentMedFrequency);
-          var dayCount = medicationHelper.getDayCount(currentMedDuration);
-
+          var medDate = new Date();
+          var frequency = parseInt(medicationHelper.getFrequency(currentMedFrequency),10);
+          var dayCount = parseInt(medicationHelper.getDayCount(currentMedDuration),10);
+          var key, value;
           for (var i = 0; i < dayCount; i += frequency)
           {
-            var key = currentMedName + ';' + textHelper.formatDate(date) + ';'
-              + currentMedFrequency;
-            var value = currentMedDosage + ';not taken';
+            key = currentMedName + ';' + textHelper.formatDate(medDate);
+            value = currentMedDosage + ';not taken';
             medList.data.medications.push(key);
             medList.data.dosages[key] = value;
 
-            date.setDate(date.getDate() + frequency);
+            medDate.setDate(medDate.getDate() + frequency);
           }
           speechOutput = currentMedDosage + ' of ' + currentMedName + ' added for '
-            + currentMedDuration + ' ' + currentMedFrequency + '.';
+            + currentMedDuration + ' taken ' + currentMedFrequency + '.';
           medList.save(function () {
               response.tell(speechOutput);
           });
@@ -184,16 +182,16 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             var medName = intent.slots.Medication.value;
             var currentDate = textHelper.formatDate(new Date());
             var keyPrefix = medName + ';' + currentDate;
-            medList.data.medications.forEach( function (med) {
-              if (med.includes(keyPrefix))
-              {
-                keyPrefix = med;
-              }
-            });
+            // medList.data.medications.forEach( function (med) {
+            //   if (med.includes(keyPrefix))
+            //   {
+            //     keyPrefix = med;
+            //   }
+            // });
             var value = medList.data.dosages[keyPrefix].split(';');
             value[1] = "taken";
             medList.data.dosages[keyPrefix] = value.join(';');
-            speechOutput = 'Great job taking your ' + medName + '.';
+            speechOutput = 'Great job taking your ' + medName + '. ';
             var medListCopy = [];
             medList.data.medications.forEach(function (med) {
                 medListCopy.push({
@@ -204,10 +202,11 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
             var medsToTakeToday = medicationHelper.getMissedMedicationsForDate(currentDate, medListCopy);
             if (medsToTakeToday.length == 0)
             {
-              speechOutput = ' You have no more medications to take today.';
+              speechOutput += 'You have no more medications to take today.';
             }
             else
             {
+              speechOutput += 'You still need to take the following medications. ';
               medsToTakeToday.forEach(function (med) {
                 var keySplit = med.name.split(';');
                 var valueSplit = med.dosage.split(';');
@@ -218,16 +217,23 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
                 response.tell(speechOutput);
             });
         });
+    };
 
-<<<<<<< HEAD
     intentHandlers.ReportIntent = function (intent, session, response) {
       storage.loadMedList(session, function (medList) {
         // code that will break program goes here
-        var speechOutput = 'You missed the following medications.';
-        var currentDate = textHelper.formatDate(new Date());
-        var missedMeds = getPreviouslyMissedMedications(currentDate,medList.data.medications);
+        var speechOutput = 'Here\'s you\'re report for ' + intent.slots.MedDate.value;
+        var date = textHelper.formatDate(intent.slots.MedDate.value);
+        var medListCopy = [];
+        medList.data.medications.forEach(function (med) {
+            medListCopy.push({
+                dosage: medList.data.dosages[med],
+                name: med
+            });
+        });
+        var missedMeds = medicationHelper.getPreviouslyMissedMedications(date,medListCopy);
 
-        medListCopy.forEach(function (med) {
+        missedMeds.forEach(function (med) {
           var parsedMed = med.name.split(';');
           var parsedDosage = med.dosage.split(';');
           speechOutput += parsedDosage[0] + ' of ' + parsedMed[0] + ' not taken on ' + parsedMed[1] + ' in the ' + parsedMed[2] + '. ';
@@ -235,13 +241,6 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
         response.tell(speechOutput);//get rekt
       });
     };
-=======
-    // intentHandlers.ReportIntent = function (intent, session, response) {
-    //   storage.loadMedList(session, function (medList) {
-    //     // code goes Here
-    //   });
-    // };
->>>>>>> origin/master
 
     intentHandlers.NewGameIntent = function (intent, session, response) {
         //reset scores for all existing players

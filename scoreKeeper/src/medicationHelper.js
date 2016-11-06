@@ -11,25 +11,31 @@ var medicationHelper = (function () {
     return {
         getFrequency: function (frequencyString) {
             var frequency = 1;
-
             var frequencyArray = frequencyString.split(' ');
 
-            for(var i=0; i<frequencyArray.length; i++){
-
-              if(frequencyArray[i] === parseInt(frequencyArray[i], 10)){
+            for(var i=0; i<frequencyArray.length; i++)
+            {
+              if(!isNaN(frequencyArray[i]))
+              {
                 frequency = frequencyArray[i];
               }
-              else if(frequencyArray[i].contains('week')){
+
+              else if(frequencyArray[i].includes('week'))
+              {
                 frequency *= 7;
               }
-              else if(frequencyArray[i].contains('month')){
+
+              else if(frequencyArray[i].includes('month'))
+              {
                 frequency *= 30;
               }
-              else if(frequencyArray[i].contains('year')){
+
+              else if(frequencyArray[i].includes('year'))
+              {
                 frequency *= 365;
               }
 
-              if(i > 0 && frequencyArray[i-1] === 'other'){
+              if(frequencyArray[i] === 'other'){
                 frequency *= 2;
               }
             }
@@ -82,7 +88,7 @@ var medicationHelper = (function () {
         },
 
         getPreviouslyMissedMedications: function (date, meds) {
-          var missedMedsBeforeDate = []
+          var missedMedsBeforeDate = [];
           meds.forEach(function (med)
           {
             var parsedKey = med.name.split(';');
@@ -94,7 +100,7 @@ var medicationHelper = (function () {
               var parsedValue = med.dosage.split(';');
               if (parsedValue.length > 1 && parsedValue[1] === 'not taken')
               {
-                medsOnDate.push(med);
+                missedMedsBeforeDate.push(med);
               }
             }
           });
@@ -104,7 +110,7 @@ var medicationHelper = (function () {
         //date as the key form
         //meds: {name:, dosage:}
         getAllMedicationsForDate: function (date, meds) {
-          var medsOnDate = []
+          var medsOnDate = [];
           meds.forEach(function (med)
           {
             var parsedKey = med.name.split(';');
@@ -117,7 +123,7 @@ var medicationHelper = (function () {
         },
 
         getTakenMedicationsForDate: function (date, meds) {
-          var takenMedsOnDate = []
+          var takenMedsOnDate = [];
           meds.forEach(function (med)
           {
             var parsedKey = med.name.split(';');
@@ -126,7 +132,7 @@ var medicationHelper = (function () {
               var parsedValue = med.dosage.split(';');
               if (parsedValue.length > 1 && parsedValue[1] === 'taken')
               {
-                medsOnDate.push(med);
+                takenMedsOnDate.push(med);
               }
             }
           });
@@ -134,7 +140,7 @@ var medicationHelper = (function () {
         },
 
         getMissedMedicationsForDate: function (date, meds) {
-          var missedMedsOnDate = []
+          var missedMedsOnDate = [];
           meds.forEach(function (med)
           {
             var parsedKey = med.name.split(';');
@@ -143,7 +149,7 @@ var medicationHelper = (function () {
               var parsedValue = med.dosage.split(';');
               if (parsedValue.length > 1 && parsedValue[1] === 'not taken')
               {
-                medsOnDate.push(med);
+                missedMedsOnDate.push(med);
               }
             }
           });
