@@ -4,19 +4,20 @@ NewMedIntent add {Medication} to my medications
 NewMedIntent add {Dosage} of {Medication}
 NewMedIntent add {Dosage} of {Medication} to my schedule
 NewMedIntent add {Dosage} of {Medication} to my medications
-NewMedIntent add {Dosage} of {Medication} for {Duration}
-NewMedIntent add {Dosage} of {Medication} to my schedule for {Duration}
-NewMedIntent add {Dosage} of {Medication} to my medications for {Duration}
+NewMedIntent add {Dosage} of {Medication} to be taken {Frequency}
+NewMedIntent add {Dosage} of {Medication} to my schedule to be taken {Frequency}
+NewMedIntent add {Dosage} of {Medication} to my medications to be taken {Frequency}
 NewMedIntent add {Dosage} of {Medication} for {Duration} to be taken {Frequency}
 NewMedIntent add {Dosage} of {Medication} to my schedule for {Duration} to be taken {Frequency}
 NewMedIntent add {Dosage} of {Medication} to my medications for {Duration} to be taken {Frequency}
 NewMedIntent I am taking {Medication} now
-NewMedIntent I am taking {Dosage} of {Medication} for {Duration}
-NewMedIntent I am taking {Medication} for {Duration}
+NewMedIntent I am now taking {Medication}
+NewMedIntent I am taking {Dosage} of {Medication} now
+NewMedIntent I am now taking {Dosage} of {Medication}
+
 
 GetDosageIntent {Dosage}
 GetDosageIntent I need to take {Dosage}
-GetDosageIntent I need to take {Dosage} every day
 
 GetDurationIntent {Duration}
 GetDurationIntent for {Duration}
