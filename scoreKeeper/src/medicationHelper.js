@@ -130,7 +130,7 @@ var medicationHelper = (function () {
             if (parsedKey[1] === date)
             {
               var parsedValue = med.dosage.split(';');
-              if (parsedValue.length > 1 && parsedValue[1] === 'taken')
+              if (parsedValue[1] === 'taken')
               {
                 takenMedsOnDate.push(med);
               }
@@ -147,7 +147,7 @@ var medicationHelper = (function () {
             if (parsedKey[1] === date)
             {
               var parsedValue = med.dosage.split(';');
-              if (parsedValue.length > 1 && parsedValue[1] === 'not taken')
+              if (parsedValue[1] === 'not taken')
               {
                 missedMedsOnDate.push(med);
               }
