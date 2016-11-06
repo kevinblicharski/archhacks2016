@@ -134,6 +134,11 @@ var registerIntentHandlers = function (intentHandlers, skillContext) {
       //terminate or continue the conversation based on whether the intent
       //is from a one shot command or not.
       storage.loadMedList(session, function (medList) {
+          if (!(currentMedName && currentMedDosage && currentMedFrequency))
+          {
+            response.tell('Please specify the name of the medication first.');
+            return;
+          }
           var speechOutput = '';
 
           currentMedDuration = intent.slots.Duration.value;
